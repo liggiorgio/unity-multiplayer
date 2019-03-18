@@ -32,18 +32,23 @@ public class Player : MonoBehaviour {
 	// Serialize function
 	void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info) {
 		Vector3 syncPosition = Vector3.zero;
+		Vector3 syncVelocity = Vector3.zero;
 		if (stream.isWriting) {
 			syncPosition = rb.position;
 			stream.Serialize(ref syncPosition);
+
+			syncVelocity = rb.velocity;
+			stream.Serialize(ref syncVelocity);
 		} else {
 			stream.Serialize(ref syncPosition);
+			stream.Serialize(ref syncVelocity);
 
 			syncTime = 0f;
 			syncDelay = Time.time - lastSyncTime;
 			lastSyncTime = Time.time;
 
 			syncStartPosition = rb.position;
-			syncEndPosition = syncPosition;
+			syncEndPosition = syncPosition + syncVelocity * syncDelay;
 		}
 	}
 
