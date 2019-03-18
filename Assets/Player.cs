@@ -8,6 +8,12 @@ public class Player : MonoBehaviour {
 	private Rigidbody rb;
 	private NetworkView nw;
 
+	private float lastSyncTime = 0f;
+	private float syncDelay = 0f;
+	private float syncTime = 0f;
+	private Vector3 syncStartPosition = Vector3.zero;
+	private Vector3 syncEndPosition = Vector3.zero;
+
 	// Move player based on input
 	void InputMovement() {
 		if (Input.GetKey(KeyCode.W))
@@ -31,7 +37,13 @@ public class Player : MonoBehaviour {
 			stream.Serialize(ref syncPosition);
 		} else {
 			stream.Serialize(ref syncPosition);
-			rb.position = syncPosition;
+
+			syncTime = 0f;
+			syncDelay = Time.time - lastSyncTime;
+			lastSyncTime = Time.time;
+
+			syncStartPosition = rb.position;
+			syncEndPosition = syncPosition;
 		}
 	}
 
@@ -45,6 +57,13 @@ public class Player : MonoBehaviour {
 	void Update () {
 		if (nw.isMine)
 			InputMovement();
+		else
+			SyncedMovement();
+	}
+
+	private void SyncedMovement() {
+		syncTime += Time.deltaTime;
+		rb.position = Vector3.Lerp(syncStartPosition, syncEndPosition, syncTime/syncDelay);
 	}
 
 }
