@@ -23,6 +23,18 @@ public class Player : MonoBehaviour {
       rb.MovePosition(rb.position - Vector3.right * speed * Time.deltaTime);
 	}
 
+	// Serialize function
+	void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info) {
+		Vector3 syncPosition = Vector3.zero;
+		if (stream.isWriting) {
+			syncPosition = rb.position;
+			stream.Serialize(ref syncPosition);
+		} else {
+			stream.Serialize(ref syncPosition);
+			rb.position = syncPosition;
+		}
+	}
+
 	// Use this for initialization
 	void Start () {
 		rb = GetComponent<Rigidbody>();
