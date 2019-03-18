@@ -7,10 +7,11 @@ public class NetworkManager : MonoBehaviour {
 	private const string typeName = "UMDemo";
 	private const string gameName = "UMRoom";
 	private HostData[] hostList;
+	public GameObject playerPrefab;
 
 	// Called when successfully joined a hosted game
 	void OnConnectedToServer() {
-		Debug.Log("Server Joined");
+		SpawnPlayer();
 	}
 
 	// Draw UI buttons
@@ -40,7 +41,7 @@ public class NetworkManager : MonoBehaviour {
 
 	// Called if the server is successfully Initialised
 	void OnServerInitialized() {
-		Debug.Log("Server initialised");
+		SpawnPlayer();
 	}
 
 	// Use this for initialization
@@ -61,6 +62,11 @@ public class NetworkManager : MonoBehaviour {
 	// Update the hosts list
 	private void RefreshHostList() {
 		MasterServer.RequestHostList(typeName);
+	}
+
+	// Create a player oject
+	private void SpawnPlayer() {
+		Network.Instantiate(playerPrefab, new Vector3(0f, .5f, 0f), Quaternion.identity, 0);
 	}
 
 	// Initialize game server
